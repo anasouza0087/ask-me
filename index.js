@@ -1,11 +1,30 @@
 import express from 'express'
+import bodyParser from 'body-parser'
 
 const app = express()
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
     res.render('index')
+});
+
+app.get('/questions', (req, res) => {
+    res.render('questions')
+})
+
+app.post('/saveQuestion', (req, res) => {
+    const title = req.body.title || "-"
+    const description = req.body.description || "-"
+    const message = 'Pergunta recebida com sucesso!'
+    res.send(`<b>${message}</b> 
+    <br><br> 
+    <b>Título:</b> ${title} 
+    <br> 
+    <b>Descrição:</b> ${description}`
+    )
 })
 
 // app.get('/:name/:lang', (req, res) => {

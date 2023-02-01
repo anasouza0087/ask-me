@@ -1,0 +1,18 @@
+label {
+    font-weight: bold;
+}
+
+body {
+    background-color: #eceff1;
+}
+
+#form-questions{
+    margin-top: 5vh;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+}
+
