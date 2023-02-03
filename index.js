@@ -1,11 +1,21 @@
-import express from 'express'
-import bodyParser from 'body-parser'
+const express = require('express')
+const bodyParser = require('body-parser')
+const connection = require('./database/database')
+const Question = require('./database/Questions')
 
 const app = express()
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+
+connection.authenticate()
+    .then(() => {
+        console.log('Conexão estabelecida!')
+    })
+    .catch((error) => {
+        console.log(error)
+    })
 
 app.get('/', (req, res) => {
     res.render('index')
