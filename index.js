@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const connection = require('./database/database')
 const Question = require('./database/Questions')
+const Answer = require('./database/Answer')
 
 const app = express()
 app.set('view engine', 'ejs')
@@ -18,23 +19,63 @@ connection.authenticate()
     })
 
 app.get('/', (req, res) => {
-    res.render('index')
+    Question.findAll({
+        raw: true, order: [
+            ['id', 'DESC']
+        ]
+    }).then(questions => {
+        res.render('index', {
+            questions: questions
+        })
+    })
 });
 
 app.get('/questions', (req, res) => {
     res.render('questions')
 })
 
+app.get('/question/:id', (req, res) => {
+    const id = req.params.id
+    Question.findOne({
+        where: { id: id },
+    }).then(question => {
+        if (question) {
+            Answer.findAll({
+                where: { questionId: question.id },
+                order: [['id', 'DESC']]
+            }).then(answers => {
+                res.render('question', {
+                    question: question,
+                    answers: answers
+                })
+            })
+        } else {
+            res.redirect('/')
+        }
+    })
+});
+
 app.post('/saveQuestion', (req, res) => {
     const title = req.body.title || "-"
     const description = req.body.description || "-"
-    const message = 'Pergunta recebida com sucesso!'
-    res.send(`<b>${message}</b> 
-    <br><br> 
-    <b>Título:</b> ${title} 
-    <br> 
-    <b>Descrição:</b> ${description}`
-    )
+    Question.create({
+        title: title,
+        description: description
+    }).then(() => {
+        res.redirect('/')
+    })
+})
+
+
+app.post('/answer', (req, res) => {
+    const body = req.body.bodyAnswer
+    const questionId = req.body.questionId
+    Answer.create({
+        body: body,
+        questionId: questionId
+    }).then(() => {
+        res.redirect('/question/' + questionId)
+    })
 })
 
 // app.get('/:name/:lang', (req, res) => {
